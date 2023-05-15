@@ -1,24 +1,14 @@
-let words = {
-    "rainbow": 5,
-    "unicorn": 3,
-    "hello": 2,
-    "gloom": -1
-}
+import { readFileSync, writeFile } from 'fs';
 
+import express from 'express';
 
-console.log(`Node is running`);
+const app = express();
 
-var express = require('express');
-var app = express();
+app.listen(3000);
+var data = readFileSync("./words.json");
+const words = JSON.parse(data);
 
-var server = app.listen(3000, listening);
-
-
-function listening(){
-    console.log('listening');
-}
-
-app.use(express.static('public'));
+console.log(words)
 
 app.get('/search/:flower/:num', function(req, res){
     let data = req.params;
@@ -45,14 +35,15 @@ app.get('/add/:word/:score?', (req, res) => {
     let score = Number(data.score);
     let reply = {};
 
-    words[word] = score;
-
     if(!score){
         reply = {
             msg: "score is  required",
         }
     }
     else{
+        words[word] = score;
+        let data = JSON.stringify(words);
+        writeFile('words.json', data, (err) => {console.log(err)});
         reply = {
             msg:"Thank you so much for your word"
         }
@@ -78,7 +69,5 @@ app.get('/search/:word', (req, res) => {
             word: word,
         }
     }
-
     return res.send(reply);
-
 })
